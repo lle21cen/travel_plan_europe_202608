@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 유럽 여행 플래너</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rome: #B03A2E;
+    --florence: #7D6608;
+    --nice: #1A6AA0;
+    --paris: #5B4A8A;
+    --flight: #2E4057;
+    --bg: #FAF9F6;
+    --card: #FFFFFF;
+    --border: #E8E4DC;
+    --text: #2C2C2C;
+    --muted: #888;
+    --radius: 14px;
+    --sm-radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px 60px; max-width: 780px; margin: 0 auto; }
+
+  /* ─── HEADER ─── */
+  h1.trip-title { font-family: 'Playfair Display', serif; font-size: 26px; text-align: center; color: var(--text); margin-bottom: 4px; }
+  .trip-sub { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .traveler-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 28px; }
+  .tbadge { font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 999px; background: #F0EDE8; color: #555; }
+
+  .route-bar { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 32px; flex-wrap: wrap; }
+  .city-pill { font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px; color: #fff; }
+  .route-arrow { color: var(--muted); font-size: 14px; }
+
+  /* ─── SECTION LABEL ─── */
+  .section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin: 28px 0 10px; padding-left: 4px; border-left: 3px solid #DDD; padding-left: 10px; }
+
+  /* ─── FLIGHT CARD ─── */
+  .flight-card { background: var(--flight); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; color: #fff; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .flight-route { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
+  .airport { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+  .flight-arrow { font-size: 20px; opacity: 0.7; }
+  .flight-meta { display: flex; flex-direction: column; gap: 3px; }
+  .flight-name { font-size: 13px; font-weight: 700; }
+  .flight-detail { font-size: 11px; opacity: 0.75; }
+  .flight-times { display: flex; gap: 18px; }
+  .ftime { display: flex; flex-direction: column; align-items: center; }
+  .ftime-time { font-size: 16px; font-weight: 700; }
+  .ftime-label { font-size: 10px; opacity: 0.65; }
+  .flight-badge { font-size: 10px; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.18); margin-top: 2px; }
+  .booking-info { font-size: 11px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; width: 100%; }
+
+  /* ─── ALERT CARD ─── */
+  .alert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; margin-bottom: 10px; }
+  .alert-card { border-radius: var(--sm-radius); padding: 12px 14px; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+  .alert-card.red { background: #FDEDEC; color: #922B21; border: 1px solid #F1948A; }
+  .alert-card.amber { background: #FEF9E7; color: #7D6608; border: 1px solid #F9E79F; }
+  .alert-card.blue { background: #EBF5FB; color: #1A5276; border: 1px solid #AED6F1; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-title { font-weight: 700; font-size: 12px; display: block; margin-bottom: 2px; }
+
+  /* ─── DAY CARD ─── */
+  .day-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+  .day-header { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  .day-num { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: #fff; flex-shrink: 0; }
+  .day-city { font-size: 14px; font-weight: 500; }
+  .day-date { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .day-body { padding: 10px 16px; display: flex; flex-direction: column; gap: 7px; }
+  .event { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+  .event-icon { font-size: 15px; margin-top: 1px; flex-shrink: 0; width: 20px; }
+  .event-content { line-height: 1.5; flex: 1; }
+  .event-time { font-size: 11px; color: var(--muted); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 999px; margin-left: 4px; vertical-align: middle; }
+  .tag-done { background: #E8F5E9; color: #2E7D32; }
+  .tag-todo { background: #FFF8E1; color: #E65100; }
+  .tag-info { background: #E3F2FD; color: #1565C0; }
+  .tag-tip { background: #F3E5F5; color: #6A1B9A; }
+  .tag-warn { background: #FFF3E0; color: #BF360C; }
+
+  /* inline flight inside day */
+  .flight-inline { background: #F0F4F8; border-radius: var(--sm-radius); padding: 8px 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .fi-airports { font-size: 14px; font-weight: 700; color: var(--flight); letter-spacing: 1px; }
+  .fi-arrow { color: #aaa; }
+  .fi-info { font-size: 12px; color: #555; }
+
+  /* ─── FOOD SECTION ─── */
+  .food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; }
+  .food-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .food-city { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; color: #fff; display: inline-block; margin-bottom: 8px; }
+  .food-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .food-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 6px; }
+  .food-tip { font-size: 11px; background: #FFF8E1; color: #7D6608; border-radius: 6px; padding: 4px 8px; }
+
+  /* ─── CHECKLIST ─── */
+  .check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .check-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .check-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F0EDE8; font-size: 13px; cursor: pointer; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; cursor: pointer; accent-color: #5B4A8A; }
+  .check-item label { cursor: pointer; line-height: 1.4; }
+  .check-item.done label { text-decoration: line-through; color: #bbb; }
+  .must-tag { font-size: 10px; padding: 1px 6px; border-radius: 999px; background: #FFEBEE; color: #C62828; font-weight: 700; margin-left: 4px; vertical-align: middle; }
+
+  /* ─── REMIND ─── */
+  .remind { background: #FFF8E1; border: 1px solid #FFE082; border-radius: var(--radius); padding: 13px 16px; font-size: 13px; color: #5D4037; margin-top: 24px; display: flex; gap: 10px; align-items: flex-start; }
+</style>
+</head>
+<body>
+
+<h1 class="trip-title">✈ 2026 유럽 8박 10일</h1>
+<p class="trip-sub">Aug 6 – Aug 16 &nbsp;|&nbsp; 참새 · 호피</p>
+
+<div class="traveler-badge">
+  <span class="tbadge">👩 참새</span>
+  <span class="tbadge">👨 호피 (남편)</span>
+  <span class="tbadge">2인 여행</span>
+</div>
+
+<div class="route-bar">
+  <span class="city-pill" style="background:var(--rome)">로마</span>
+  <span class="route-arrow">→</span>
+  <span class="city-pill" style="background:var(--florence)">피렌체</span>
+  <span class="route-arrow">→</span>
+  <span class="city-pill" style="background:var(--nice)">니스</span>
+  <span class="route-arrow">→</span>
+  <span class="city-pill" style="background:var(--paris)">파리</span>
+</div>
+
+<!-- ─── ALERTS ─── -->
+<div class="section-label">⚠️ 출발 전 필수 처리</div>
+<div class="alert-grid">
+  <div class="alert-card red">
+    <span class="alert-icon">🛂</span>
+    <div><span class="alert-title">여권 정보 등록</span>출발 3일 전까지 아시아나 홈페이지에 여권 정보 등록 필수</div>
+  </div>
+  <div class="alert-card amber">
+    <span class="alert-icon">🏅</span>
+    <div><span class="alert-title">마일리지 등록</span>아시아나 OZ561 / OZ502 탑승 전 마일리지 번호 등록 필요</div>
+  </div>
+  <div class="alert-card blue">
+    <span class="alert-icon">🛡️</span>
+    <div><span class="alert-title">여행자 보험 가입</span>출발 전 해외여행 보험 가입 (항공 지연·의료비 포함 상품 추천)</div>
+  </div>
+</div>
+
+<!-- ─── FLIGHTS ─── -->
+<div class="section-label">✈️ 항공편 정보</div>
+
+<div class="flight-card">
+  <div class="flight-route">
+    <div class="airport">ICN</div>
+    <div class="flight-arrow">✈</div>
+    <div class="airport">FCO</div>
+  </div>
+  <div class="flight-times">
+    <div class="ftime"><span class="ftime-time">13:20</span><span class="ftime-label">출발</span></div>
+    <div class="ftime"><span class="ftime-time">19:35</span><span class="ftime-label">도착</span></div>
+  </div>
+  <div class="flight-meta">
+    <span class="flight-name">아시아나항공 OZ561</span>
+    <span class="flight-detail">8월 6일 (목) · 인천 → 로마 피우미치노</span>
+    <span class="flight-badge">참새·호피 2인 완료</span>
+  </div>
+  <div class="booking-info">📱 예약처: 마이리얼트립 · 참새 결제 완료</div>
+</div>
+
+<div class="flight-card" style="background:#5D6D7E">
+  <div class="flight-route">
+    <div class="airport">FLR</div>
+    <div class="flight-arrow">✈</div>
+    <div class="airport">NCE</div>
+  </div>
+  <div class="flight-times">
+    <div class="ftime"><span class="ftime-time">11:50</span><span class="ftime-label">출발</span></div>
+    <div class="ftime"><span class="ftime-time">13:10</span><span class="ftime-label">도착(예상)</span></div>
+  </div>
+  <div class="flight-meta">
+    <span class="flight-name">에어코르시카 XK713</span>
+    <span class="flight-detail">8월 10일 (월) · 피렌체 → 니스 · 1시간 20분</span>
+    <span class="flight-badge">Alenia ATR72 소형기 · 참새·호피 2인 완료</span>
+  </div>
+  <div class="booking-info">📱 예약처: 트립닷컴 · 참새 결제 완료</div>
+</div>
+
+<div class="flight-card" style="background:#1A6AA0">
+  <div class="flight-route">
+    <div class="airport">NCE</div>
+    <div class="flight-arrow">✈</div>
+    <div class="airport">ORY</div>
+  </div>
+  <div class="flight-times">
+    <div class="ftime"><span class="ftime-time">11:10</span><span class="ftime-label">출발</span></div>
+    <div class="ftime"><span class="ftime-time">12:40</span><span class="ftime-label">도착(예상)</span></div>
+  </div>
+  <div class="flight-meta">
+    <span class="flight-name">트랜스아비아 프랑스 TO7131</span>
+    <span class="flight-detail">8월 12일 (수) · 니스 → 파리 오를리 · 1시간 30분</span>
+    <span class="flight-badge">참새·호피 2인 완료</span>
+  </div>
+  <div class="booking-info">📱 예약처: 트립닷컴 · 참새 결제 완료</div>
+</div>
+
+<div class="flight-card">
+  <div class="flight-route">
+    <div class="airport">CDG</div>
+    <div class="flight-arrow">✈</div>
+    <div class="airport">ICN</div>
+  </div>
+  <div class="flight-times">
+    <div class="ftime"><span class="ftime-time">19:10</span><span class="ftime-label">출발</span></div>
+    <div class="ftime"><span class="ftime-time">14:10</span><span class="ftime-label">익일 도착</span></div>
+  </div>
+  <div class="flight-meta">
+    <span class="flight-name">아시아나항공 OZ502</span>
+    <span class="flight-detail">8월 16일 (일) · 파리 샤를드골 → 인천</span>
+    <span class="flight-badge">참새·호피 2인 완료</span>
+  </div>
+  <div class="booking-info">📱 예약처: 참새 결제 완료</div>
+</div>
+
+<!-- ─── HOTELS ─── -->
+<div class="section-label">🏨 숙소 정보</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:4px;">
+
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:var(--rome);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;">로마</span>
+      <span style="font-size:13px;font-weight:700;">산티나 호텔</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">테르미니역 인근 · 4성급 · 8/6~8/8 (2박)</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">₩412,000</div>
+    <div style="font-size:11px;color:#888;">여기어때 · 👨 호피 예약 · <span style="color:#2E7D32;font-weight:700;">무료취소 가능</span></div>
+  </div>
+
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:var(--florence);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;">피렌체</span>
+      <span style="font-size:13px;font-weight:700;">7플로렌스</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">중앙역 바로 앞 · 8/8~8/10 (2박)</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">₩480,000</div>
+    <div style="font-size:11px;color:#888;">여기어때 · 👩 참새 예약 · <span style="color:#2E7D32;font-weight:700;">무료취소 가능</span></div>
+  </div>
+
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:var(--nice);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;">니스</span>
+      <span style="font-size:13px;font-weight:700;">라 빌라 니스</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">조식 포함 · 해변 인근 · 8/10~8/12 (2박)</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">₩620,000</div>
+    <div style="font-size:11px;color:#888;">여기어때 · 👩 참새 예약 · <span style="color:#2E7D32;font-weight:700;">무료취소 가능</span></div>
+  </div>
+
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:var(--paris);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;">파리</span>
+      <span style="font-size:13px;font-weight:700;">시타딘 레 알</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">루브르 인근 · 8/12~8/15 (3박)</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">₩716,000</div>
+    <div style="font-size:11px;color:#888;">여기어때 · 👩 참새 예약 · <span style="color:#2E7D32;font-weight:700;">무료취소 가능</span></div>
+  </div>
+
+</div>
+<div style="background:#F0F7F0;border:1px solid #C8E6C9;border-radius:var(--sm-radius);padding:10px 14px;font-size:12px;color:#2E7D32;margin-bottom:4px;">
+  💰 숙소 합계 <strong>₩2,228,000</strong> · 전 숙소 무료취소 가능 · 에어컨·엘리베이터 완비
+</div>
+
+<!-- ─── ITINERARY ─── -->
+<div class="section-label">📅 전체 일정</div>
+
+<!-- D1 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--rome)">D1</span>
+    <span class="day-city">🇮🇹 로마 입국</span>
+    <span class="day-date">8/6 목</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">✈️</span><div class="event-content"><span class="event-time">13:20</span> 인천 출발 · 아시아나 OZ561</div></div>
+    <div class="event"><span class="event-icon">🛬</span><div class="event-content"><span class="event-time">19:35</span> FCO 도착 · 입국심사 + 짐 수령 약 40~50분</div></div>
+    <div class="event"><span class="event-icon">🚕</span><div class="event-content"><span class="event-time">약 20:30</span> 전용 택시 탑승 → 산티나 호텔<br><span style="font-size:11px;color:#888">FCO→테르미니 택시 고정요금 €48 · 소요 약 45~60분 → 숙소 도착 약 21:15~21:30</span></div></div>
+  </div>
+</div>
+
+<!-- D2 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--rome)">D2</span>
+    <span class="day-city">🇮🇹 로마</span>
+    <span class="day-date">8/7 금</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🏛️</span><div class="event-content">오전 콜로세움 · 포로 로마노 · 트레비 분수 등 시내 관광</div></div>
+    <div class="event"><span class="event-icon">🎟️</span><div class="event-content">오후 바티칸 박물관 투어 <span class="tag tag-todo">예약 필요</span></div></div>
+  </div>
+</div>
+
+<!-- D3 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--rome)">D3</span>
+    <span class="day-city">🚌 로마 → 피렌체 (토스카나 투어)</span>
+    <span class="day-date">8/8 토</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">⏰</span><div class="event-content"><span class="event-time">08:00</span> 숙소 출발 (피렌체 이동일 — 큰 짐 포함)</div></div>
+    <div class="event"><span class="event-icon">🍷</span><div class="event-content">치비타 토스카나 와이너리 사이프러스 투어 <span class="tag tag-done">마이리얼트립 결제 완료</span><br><span class="tag tag-warn">🎧 개인 이어폰 필수</span> <span class="tag tag-warn">💶 현금 €30/인 이상</span></div></div>
+    <div class="event"><span class="event-icon">⏰</span><div class="event-content"><span class="event-time">18:00</span> 투어 종료 · 중앙역 하차 → 7플로렌스 체크인 (도보 5분)</div></div>
+    <div class="event"><span class="event-icon">🥩</span><div class="event-content"><span class="event-time">20:30</span> 저녁 — 부카 마리오 <span class="tag tag-done">플랜A · bucamario.com 예약</span><br>
+    <div style="margin-top:6px;padding:8px 10px;background:#FFF3E0;border-radius:8px;font-size:12px;color:#BF360C;">
+      🅱️ <strong>플랜B (8월 휴가로 부카마리오 불가 시)</strong><br>
+      <strong>트라토리아 달오스테 (Trattoria Dall'Oste)</strong> — 중앙역 도보 5분, 한국어 메뉴판, 1kg 약 €65, TheFork앱 예약<br>
+      <strong>트라토리아 자자 (Trattoria Zaza)</strong> — 중앙시장 옆, 1kg 약 €45 가성비, TheFork앱 예약
+    </div></div></div>
+  </div>
+</div>
+
+<!-- D4 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--florence)">D4</span>
+    <span class="day-city">🇮🇹 피렌체 자유 일정</span>
+    <span class="day-date">8/9 일</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🍽️</span><div class="event-content">점심 — 트라토리아 마리오 <span class="tag tag-info">로컬 맛집 · 현금 선호 · 점심만 영업</span><br><span style="font-size:11px;color:#888">⚠️ 예약 불가 · 12:00 오픈런 필수 · 11:45 도착 추천 (12:30엔 만석)</span></div></div>
+    <div class="event"><span class="event-icon">🎨</span><div class="event-content">두오모 · 우피치 미술관 관람</div></div>
+    <div class="event"><span class="event-icon">🌇</span><div class="event-content">저녁 — 미켈란젤로 광장 석양 감상 후 자유 식사</div></div>
+  </div>
+</div>
+
+<!-- D5 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--nice)">D5</span>
+    <span class="day-city">✈️ 피렌체 → 니스</span>
+    <span class="day-date">8/10 월</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">⏰</span><div class="event-content"><span class="event-time">09:10</span> 숙소 출발 → 피렌체 공항 (FLR)<br><span style="font-size:11px;color:#888">7플로렌스→공항 택시 약 20분 · 출국수속 포함 여유있게 출발</span></div></div>
+    <div class="event"><span class="event-icon">✈️</span><div class="event-content"><span class="event-time">11:50</span> FLR 출발 → XK713 에어코르시카 · 1시간 20분 · ATR72 소형기</div></div>
+    <div class="event"><span class="event-icon">🛬</span><div class="event-content"><span class="event-time">13:10</span> NCE 도착</div></div>
+    <div class="event"><span class="event-icon">🚃</span><div class="event-content">트램 T2 탑승 → 시내 이동 약 25분 · €1.5<br><span style="font-size:11px;color:#888">공항 T2 터미널 앞 승차 → 라 빌라 니스 인근 정류장 하차 → 숙소 도착 약 14:00</span></div></div>
+    <div class="event"><span class="event-icon">🧳</span><div class="event-content"><span class="event-time">약 14:00</span> 라 빌라 니스 도착 — 체크인 15:00<br><div style="margin-top:4px;padding:6px 10px;background:#FFF3E0;border-radius:8px;font-size:12px;color:#BF360C;">⚠️ 체크인 1시간 전 도착 → <strong>프런트에 짐 맡기고</strong> 근처 해변 산책 or 카페에서 대기 후 15:00 체크인</div>
+    <span class="tag tag-info">라 빌라 니스 체크인 (조식 포함)</span></div></div>
+  </div>
+</div>
+
+<!-- D6 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--nice)">D6</span>
+    <span class="day-city">🇫🇷 니스</span>
+    <span class="day-date">8/11 화</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🤿</span><div class="event-content">해변 수영 & 스노클링 <span class="tag tag-tip">이후 장비 폐기</span></div></div>
+    <div class="event"><span class="event-icon">🚶</span><div class="event-content">구시가지 & 해변 산책 · 로컬 시장 구경</div></div>
+  </div>
+</div>
+
+<!-- D7 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--paris)">D7</span>
+    <span class="day-city">✈️ 니스 → 파리</span>
+    <span class="day-date">8/12 수</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">⏰</span><div class="event-content"><span class="event-time">08:20</span> 숙소 출발 → NCE 공항<br><span style="font-size:11px;color:#888">라 빌라 니스→공항 트램 T2 약 25분 · 수화물 위탁 포함 여유있게 출발</span></div></div>
+    <div class="event"><span class="event-icon">✈️</span><div class="event-content"><span class="event-time">11:10</span> NCE 출발 → TO7131 트랜스아비아 · 1시간 30분</div></div>
+    <div class="event"><span class="event-icon">🛬</span><div class="event-content"><span class="event-time">12:40</span> ORY 오를리 도착 · 짐 수령 약 20~30분</div></div>
+    <div class="event"><span class="event-icon">🚇</span><div class="event-content">메트로 14호선 탑승 → 시내 이동 약 35~40분 · €13<br><span style="font-size:11px;color:#888">ORY→시타딘 레 알(레알역) 환승 포함 약 50분 → 숙소 도착 약 14:10~14:30</span><br>
+    <div style="margin-top:4px;padding:6px 10px;background:#FFF3E0;border-radius:8px;font-size:12px;color:#BF360C;">⚠️ 체크인 15:00 전 도착 가능 → <strong>프런트에 짐 맡기고</strong> 근처 카페·레알 쇼핑센터 구경 후 15:00 체크인</div>
+    <span class="tag tag-info">시타딘 레 알 체크인</span><br>
+    <span style="font-size:11px;color:#888">☕ 1층 커피/코코아 24h 무료 · 2층 수건/휴지 셀프 보충 · TV 크롬캐스트 가능</span></div></div>
+    <div class="event"><span class="event-icon">📸</span><div class="event-content"><span class="event-time">20:30</span> 에펠탑 스냅 (30분) & 바토무슈 <span class="tag tag-todo">예약 예정</span></div></div>
+  </div>
+</div>
+
+<!-- D8 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--paris)">D8</span>
+    <span class="day-city">🇫🇷 파리</span>
+    <span class="day-date">8/13 목</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🗼</span><div class="event-content">파리 시내 자유 관광 (몽마르트 · 생제르맹 · 마레 지구)</div></div>
+    <div class="event"><span class="event-icon">🥩</span><div class="event-content">Le Relais de l'Entrecôte <span class="tag tag-info">생제르맹 지점</span><br><span style="font-size:11px;color:#888">⚠️ 예약 불가 · 저녁 19:30 오픈 · 19:00~19:10 줄서기 추천 · 대기 20~30분 예상</span></div></div>
+  </div>
+</div>
+
+<!-- D9 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--paris)">D9</span>
+    <span class="day-city">🇫🇷 파리</span>
+    <span class="day-date">8/14 금</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🛍️</span><div class="event-content">오전/오후 쇼핑 · 자유 일정</div></div>
+    <div class="event"><span class="event-icon">🌙</span><div class="event-content">루브르 야간 투어 <span class="tag tag-todo">금요일 야간 개장 활용 — 예약 예정</span></div></div>
+  </div>
+</div>
+
+<!-- D10 -->
+<div class="day-card">
+  <div class="day-header">
+    <span class="day-num" style="background:var(--paris)">D10</span>
+    <span class="day-city">✈️ 파리 → 귀국</span>
+    <span class="day-date">8/15 토 ~ 8/16 일</span>
+  </div>
+  <div class="day-body">
+    <div class="event"><span class="event-icon">🚿</span><div class="event-content">샤워기 필터 폐기 → 짐 정리 · 쇼핑 공간 확보</div></div>
+    <div class="event"><span class="event-icon">⏰</span><div class="event-content"><span class="event-time">08:40</span> 숙소 출발 → CDG 공항</div></div>
+    <div class="event"><span class="event-icon">🚆</span><div class="event-content">RER B 탑승 → CDG 공항 이동 약 35~40분 · €13 <span class="tag tag-done">강력 추천</span><br><span style="font-size:11px;color:#888">레알역 근처 RER B 탑승 → CDG T2 도착 약 09:20~09:30 · 국제선 출국수속 약 2시간 전 도착 권장</span></div></div>
+    <div class="event"><span class="event-icon">✈️</span><div class="event-content"><span class="event-time">19:10</span> CDG 출발 → 아시아나 OZ502</div></div>
+    <div class="event"><span class="event-icon">🛬</span><div class="event-content"><span class="event-time">익일 14:10</span> 인천 도착 🏠</div></div>
+  </div>
+</div>
+
+<!-- ─── FOOD ─── -->
+<div class="section-label">🍽️ 미식 미션</div>
+<div class="food-grid">
+  <div class="food-card">
+    <span class="food-city" style="background:var(--rome)">🇮🇹 로마</span>
+    <div class="food-name">정통 카르보나라</div>
+    <div class="food-desc">크림 없이 달걀노른자·치즈·관찰레로만 만드는 로마식 원조</div>
+    <div class="food-tip">💡 Trattoria Da Enzo al 29 / Roscioli 추천</div>
+  </div>
+  <div class="food-card">
+    <span class="food-city" style="background:var(--florence)">🇮🇹 피렌체</span>
+    <div class="food-name">부카 마리오 비스테카 🥩</div>
+    <div class="food-desc">1886년 역사의 정통 피렌체 티본 스테이크 (2인 €130, 굽기 알 상게 레어 고정)</div>
+    <div class="food-tip">💡 지금 bucamario.com 예약 필수! 8월 자리 빠름</div>
+  </div>
+  <div class="food-card">
+    <span class="food-city" style="background:var(--florence)">🇮🇹 피렌체 점심</span>
+    <div class="food-name">트라토리아 마리오</div>
+    <div class="food-desc">1953년 로컬 트라토리아. 합석 문화, 현금 선호, 점심만 운영</div>
+    <div class="food-tip">💡 중앙시장 다 네르보네 곱창버거(€5)도 추천!</div>
+  </div>
+  <div class="food-card">
+    <span class="food-city" style="background:var(--nice)">🇫🇷 니스</span>
+    <div class="food-name">소카 & 니수아즈 샐러드</div>
+    <div class="food-desc">병아리콩 크레이프 소카 + 현지 니수아즈 샐러드가 니스 소울푸드</div>
+    <div class="food-tip">💡 쿠르 살레야 재래시장 근처 골목 식당 추천</div>
+  </div>
+  <div class="food-card">
+    <span class="food-city" style="background:var(--paris)">🇫🇷 파리</span>
+    <div class="food-name">Le Relais de l'Entrecôte 🥩</div>
+    <div class="food-desc">메뉴는 스테이크 하나뿐. 비밀 소스 + 감자튀김 무한리필</div>
+    <div class="food-tip">💡 생제르맹 지점 오픈런 or 저녁 오픈 30분 전 줄서기</div>
+  </div>
+  <div class="food-card">
+    <span class="food-city" style="background:var(--paris)">🇫🇷 파리 젤라또</span>
+    <div class="food-name">Berthillon 베르티용</div>
+    <div class="food-desc">파리 3대 아이스크림. 생루이 섬에 위치. 8월 영업 여부 사전 확인 필요</div>
+    <div class="food-tip">💡 8월 여름 휴가 기간 문 닫을 수 있으니 확인!</div>
+  </div>
+</div>
+
+<!-- ─── BUDGET ─── -->
+<div class="section-label">💰 여행 경비 (2인 기준)</div>
+<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;">
+
+  <div style="display:flex;flex-direction:column;gap:0;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;">
+      <span>✈️ 항공비 <span style="font-size:11px;color:#aaa">(상세내역 추후 업데이트)</span></span>
+      <span style="font-weight:700;">₩4,000,000 <span style="font-size:11px;color:#aaa">인당 ~200만</span></span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;">
+      <span>🏨 숙소 (로마·피렌체·니스·파리)</span>
+      <span style="font-weight:700;">₩2,228,000</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;">
+      <span>🚌 토스카나 투어 <span style="font-size:11px;color:#aaa">마이리얼트립 · 2인</span><br>
+      <span style="font-size:11px;color:#2E7D32;">국민카드 + 톡톡마이포인트 할인 -₩20,000</span></span>
+      <span style="font-weight:700;">₩330,000 <span style="font-size:11px;color:#aaa"><s>350,000</s></span></span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;">
+      <span>💶 현금 (비상금 + 도시세 + 투어)</span>
+      <span style="font-weight:700;">€390~430 <span style="font-size:11px;color:#aaa">약 ₩570,000~630,000</span></span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F0EDE8;font-size:13px;">
+      <span>🎟️ 투어·입장료 <span style="font-size:11px;color:#aaa">바티칸·에펠탑·루브르 등</span></span>
+      <span style="font-weight:700;color:#aaa">금액 미입력</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;">
+      <span>🍽️ 식비 · 기타</span>
+      <span style="font-weight:700;color:#aaa">금액 미입력</span>
+    </div>
+
+  </div>
+
+  <div style="margin-top:12px;padding-top:12px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:14px;font-weight:700;">현재 집계 합계</span>
+    <span style="font-size:17px;font-weight:700;color:var(--paris);">₩6,558,000~+ <span style="font-size:11px;color:#aaa">투어·식비 추가 예정</span></span>
+  </div>
+</div>
+
+<!-- ─── CHECKLIST ─── -->
+<div class="section-label">✅ 준비물 & 체크리스트</div>
+<div class="check-grid" id="checklists"></div>
+
+<div class="remind">
+  <span style="font-size:18px;flex-shrink:0">🔔</span>
+  <div>
+    <strong>7월 6일 리마인더</strong> — 시타딘 레 알 파리 고층/조용한 방 요청 메일 발송 (reservations.global@the-ascott.com)<br>
+    <span style="color:#888;font-size:12px">여권 정보 · 마일리지 등록도 출발 최소 3일 전 완료 필수!</span>
+  </div>
+</div>
+
+<script>
+const lists = [
+  {
+    title:"항공·교통", icon:"✈️",
+    items:[
+      "아시아나 여권 정보 등록 (출발 3일 전까지) ★",
+      "아시아나 마일리지 번호 등록 (OZ561·OZ502) ★",
+      "여행자 보험 가입 (의료·항공 지연 포함) ★",
+      "전용 택시 예약 확인 (로마 입국)",
+      "트램 노선 저장 (T2 니스 / L2 파리 / RER B 공항)",
+      "ATR72 소형기 위탁수화물 규정 확인"
+    ]
+  },
+  {
+    title:"숙소·예약", icon:"🏨",
+    items:[
+      "바티칸 박물관 투어 예약",
+      "부카 마리오 예약 (bucamario.com) ★",
+      "에펠탑 스냅 & 바토무슈 예약",
+      "루브르 야간 투어 예약 (금요일)",
+      "시타딘 레 알 메일 발송 (7/6) ★",
+      "마이리얼트립 토스카나 투어 바우처 저장",
+      "투어 픽업 장소·시간 앱에서 재확인"
+    ]
+  },
+  {
+    title:"현금·결제", icon:"💶",
+    items:[
+      "트래블로그/트래블월렛 카드 발급",
+      "애플페이 설정 확인",
+      "비상 현금 €200~300 소액권 준비",
+      "도시세 €130 현금 별도 보관",
+      "토스카나 투어 현금 €60 (€30/인) ★",
+      "소매치기 대비 현금 분산 보관"
+    ]
+  },
+  {
+    title:"짐·필수품", icon:"🎒",
+    items:[
+      "백팩 각 1개 + 기내 캐리어 1개",
+      "개인 이어폰 (토스카나 투어 필수) ★",
+      "S자 고리 (백팩 지퍼 잠금용)",
+      "와이어 자물쇠 (기차 캐리어 고정)",
+      "스노클링 장비 (니스용, 이후 폐기)",
+      "아이패드 (파리 크롬캐스트 연결용)",
+      "멀티 어댑터 (유럽형 C타입)"
+    ]
+  },
+  {
+    title:"위생·건강", icon:"🧴",
+    items:[
+      "샤워기 필터 (석회수 대비, 파리 마지막 날 폐기)",
+      "종이비누 & 압축행주",
+      "선크림 (해변·야외 대비)",
+      "상비약 (진통제·소화제·밴드)",
+      "마스크 & 손소독제",
+      "시타딘용 종이컵·드립백"
+    ]
+  },
+  {
+    title:"앱·디지털", icon:"📱",
+    items:[
+      "로밍 또는 현지 유심 준비",
+      "구글맵 오프라인 지도 저장 (로마·피렌체·니스·파리)",
+      "번역 앱 설치",
+      "예약서 전체 클라우드 백업",
+      "숙소 주소 영문으로 저장",
+      "트립닷컴·마이리얼트립 앱 최신 업데이트"
+    ]
+  }
+];
+
+const grid = document.getElementById('checklists');
+lists.forEach(cat => {
+  const card = document.createElement('div');
+  card.className = 'check-card';
+  card.innerHTML = `<div class="check-title">${cat.icon} ${cat.title}</div>` +
+    cat.items.map((item, i) => {
+      const id = `c-${cat.title}-${i}`;
+      const isMust = item.includes('★');
+      const label = item.replace(' ★','');
+      return `<div class="check-item" id="row-${id}">
+        <input type="checkbox" id="${id}">
+        <label for="${id}">${label}${isMust ? '<span class="must-tag">필수</span>' : ''}</label>
+      </div>`;
+    }).join('');
+  grid.appendChild(card);
+});
+
+document.querySelectorAll('.check-item input').forEach(cb => {
+  cb.addEventListener('change', () => {
+    cb.closest('.check-item').classList.toggle('done', cb.checked);
+  });
+});
+</script>
+</body>
+</html>
